@@ -2,13 +2,29 @@ import { createStore, applyMiddleware, combineReducers } from 'redux';
 import { defaultState } from '../../server/defaultState';
 import { createLogger } from 'redux-logger';
 import createSagaMiddleware from 'redux-saga';
-import * as sagas from './sagas.mock';
+import * as sagas from './sagas';
 import * as mutations from './mutations';
 
 const sagaMiddleware = createSagaMiddleware();
 
 export const store = createStore(
   combineReducers({
+    session(userSession = defaultState.session || {}, action) {
+      const { type, session, authenticated } = action;
+
+      console.log(action, userSession, 'ddddddddd');
+
+      switch (type) {
+        case mutations.REQUEST_AUTHENTICATE_USER:
+          return { ...userSession, authenticated: mutations.AUTHENTICATING };
+
+        case mutations.PROCESSING_AUTHENTICATE_USER:
+          return { ...userSession, authenticated };
+
+        default:
+          return userSession;
+      }
+    },
     tasks(tasks = defaultState.tasks, action) {
       switch (action.type) {
         case mutations.CREATE_TASK:
